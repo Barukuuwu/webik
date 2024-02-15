@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container" id="image-track" data-mouse-down-at="0" data-prev-percentage="0">
+        <img id="myImg1" class="image" src="https://images.unsplash.com/photo-1682687219573-3fd75f982217?q=80&w=1375&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" draggable="false" />
+      </div>
+      <div id="kruh"></div>
+      <div id="blur"></div>
+      
+</body>
+</html>
+<style>
+.container {
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ height: 100vh;
+}
+
+.container img {
+ width: 50%;
+ height: 100%;
+ 
+}
+  body {
+  height: 100vh;
+  width: 100vw;
+  background-color: black;
+  margin: 0rem;
+  overflow: hidden;
+}
+#image-track {
+  display: flex;
+  gap: 4vmin;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(0%, -50%); 
+  user-select: none; 
+  z-index: 3;
+}
+
+#image-track > .image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 100% center;
+  cursor: pointer;
+  transition: all 1s;
+  transform-origin: center center;
+} 
+#kruh{
+    background-color: white;
+    height: 500px;
+    aspect-ratio: 1;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: linear-gradient(to right, aquamarine, mediumpurple);
+    animation: rotate 20s infinite;
+    z-index: 1;
+}
+#blur {
+    height: 100%;
+    width: 100%;
+    position:absolute;
+    z-index: 2;
+    backdrop-filter: blur(200px);
+}
+@keyframes rotate {
+    from {
+        rotate: 0deg;
+        }
+    50% {
+        scale: 1 1.5;
+    }
+    to {
+        rotate: 360deg;
+    }
+}
+
+@keyframes zoom {
+  0% {transform: scale(0);}
+  100% {transform: scale(1);}
+}
+
+
+
+.zoom {
+  animation: zoom 1s;
+  transition: transform .2s;
+}
+</style>
+<script>
+const track = document.getElementById("image-track");
+
+const handleOnDown = e => track.dataset.mouseDownAt = e.clientX;
+
+const handleOnUp = () => {
+  track.dataset.mouseDownAt = "0";  
+  track.dataset.prevPercentage = track.dataset.percentage;
+}
+
+const handleOnMove = e => {
+  if(track.dataset.mouseDownAt === "0") return;
+  
+  const mouseDelta = parseFloat(track.dataset.mouseDownAt) - e.clientX,
+        maxDelta = window.innerWidth / 2;
+  
+  const percentage = (mouseDelta / maxDelta) * -100,
+        nextPercentageUnconstrained = parseFloat(track.dataset.prevPercentage) + percentage,
+        nextPercentage = Math.max(Math.min(nextPercentageUnconstrained, 0), -100);
+  
+  track.dataset.percentage = nextPercentage;
+  
+  track.animate({
+    transform: `translate(${nextPercentage}%, -50%)`
+  }, { duration: 1200, fill: "forwards" });
+  
+  for(const image of track.getElementsByClassName("image")) {
+    image.animate({
+      objectPosition: `${100 + nextPercentage}% center`
+    }, { duration: 1200, fill: "forwards" });
+  }
+}
+
+window.onmousedown = e => handleOnDown(e);
+
+window.ontouchstart = e => handleOnDown(e.touches[0]);
+
+window.onmouseup = e => handleOnUp(e);
+
+window.ontouchend = e => handleOnUp(e.touches[0]);
+
+window.onmousemove = e => handleOnMove(e);
+
+window.ontouchmove = e => handleOnMove(e.touches[0]);
+
+
+const kruh = document.getElementById("kruh");
+
+document.body.onpointermove = event => {
+    const { clientX, clientY } = event;
+
+
+    kruh.animate({
+        left:  `${clientX}px`,
+        top: `${clientY}px`
+    }, {duration: 3000, fill: "forwards"});
+
+    kruh.style.left = `${clientX}px`;
+    kruh.style.top = `${clientY}px`;
+
+}
+
+</script>
+body {
+  height: 100vh;
+  width: 100vw;
+  background-color: rgb(255, 255, 255);
+  margin: 0rem;
+  z-index: 1;
+}
+
+.header {
+  padding: 0%;
+  text-align: center;
+  background: #444445;
+  color: rgb(180, 180, 180);
+  height: 5%;
+  font-size: 40%;
+  position: sticky;
+  filter: transparent 30%;
+  z-index: 2;
+
+}
+.line {
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.Head-box {
+  position: absolute;
+  top: 10%;
+  font-family:'Roboto', sans-serif ;
+  
+}
